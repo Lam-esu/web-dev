@@ -97,4 +97,66 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // Password Strength Analyzer
+    const pwdInput = document.getElementById('password');
+    
+    if (pwdInput) {
+        pwdInput.addEventListener('input', function() {
+            const val = this.value;
+            
+            // Define rules
+            const reqs = {
+                length: val.length >= 8,
+                upper: /[A-Z]/.test(val),
+                lower: /[a-z]/.test(val),
+                number: /[0-9]/.test(val),
+                special: /[^A-Za-z0-9]/.test(val)
+            };
+
+            let passedCount = 0;
+
+            // Toggle HTML classes for list items
+            for (const [key, passed] of Object.entries(reqs)) {
+                const el = document.getElementById('req-' + key);
+                if (el) {
+                    if (passed) {
+                        el.classList.remove('invalid');
+                        el.classList.add('valid');
+                        passedCount++;
+                    } else {
+                        el.classList.remove('valid');
+                        el.classList.add('invalid');
+                    }
+                }
+            }
+
+            // Update Progress Bar & Text
+            const bar = document.getElementById('strength-bar');
+            const text = document.getElementById('strength-text');
+            
+            if (bar && text) {
+                if (passedCount === 0) {
+                    bar.style.width = '0%';
+                    text.textContent = 'Password strength: None';
+                    text.style.color = '#dc2626';
+                } else if (passedCount <= 2) {
+                    bar.style.width = '33%';
+                    bar.style.backgroundColor = '#dc2626'; // Red
+                    text.textContent = 'Password strength: Weak';
+                    text.style.color = '#dc2626';
+                } else if (passedCount <= 4) {
+                    bar.style.width = '66%';
+                    bar.style.backgroundColor = '#f59e0b'; // Orange
+                    text.textContent = 'Password strength: Fair';
+                    text.style.color = '#f59e0b';
+                } else {
+                    bar.style.width = '100%';
+                    bar.style.backgroundColor = '#16a34a'; // Green
+                    text.textContent = 'Password strength: Strong';
+                    text.style.color = '#16a34a';
+                }
+            }
+        });
+    }
 });

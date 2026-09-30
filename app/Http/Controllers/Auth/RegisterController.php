@@ -30,10 +30,12 @@ class RegisterController extends Controller
         // - "email" must be a valid, unique email address (prevents duplicates).
         // - "password" must be confirmed (i.e. match "password_confirmation")
         //   and meet Laravel's default strength rules.
+        // Update the validation rules (usually right above the creation logic):
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'username' => 'required|string|max:50|unique:users',
+            'full_name' => 'required|string|max:120',
+            'email' => 'nullable|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
         ], [
             'name.required' => 'Please enter your full name.',
             'email.required' => 'Please enter your email address.',
@@ -49,12 +51,13 @@ class RegisterController extends Controller
         // casts "password" as "hashed", Hash::make() happens automatically
         // when the attribute is set, but we call it explicitly here as well
         // for clarity and to guarantee it regardless of casting configuration.
+        // Update the creation logic (around line 52):
         $user = User::create([
-            'name' => $validated['name'],
+            'username' => $validated['username'],
+            'full_name' => $validated['full_name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
-
         // Automatically log the newly registered user in.
         Auth::login($user);
 

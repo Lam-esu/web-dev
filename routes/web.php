@@ -1,5 +1,6 @@
 <?php
-
+use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
@@ -30,7 +31,17 @@ Route::middleware('guest')->group(function () {
 // ----------------------------------------------------------------------
 // Authenticated routes — only accessible when logged in.
 // ----------------------------------------------------------------------
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::middleware(['auth'])->group(function () {
+    
+    // Dashboard & Recording Attendance
+    Route::get('/dashboard', [AttendanceController::class, 'index'])->name('dashboard');
+    Route::post('/record-attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+
+    // Employee Registration
+    Route::get('/employee-registration', [EmployeeController::class, 'create'])->name('employee.registration');
+    Route::post('/employee-registration', [EmployeeController::class, 'store'])->name('employee.store');
+
+    // Attendance Log
+    Route::get('/attendance-log', [AttendanceController::class, 'log'])->name('attendance.log');
+
 });

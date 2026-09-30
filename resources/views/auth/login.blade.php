@@ -7,9 +7,8 @@
     <div class="auth-card">
 
         <div class="auth-brand">
-            <div class="logo-badge">L</div>
             <h1>Welcome back</h1>
-            <p>Log in to access your dashboard</p>
+            <p>Log in to access your Spotibai Dashboard</p>
         </div>
 
         {{-- Session status message (e.g. after logging out or registering) --}}

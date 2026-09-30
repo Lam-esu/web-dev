@@ -9,18 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password'); // Stored as a bcrypt hash, never plain text.
-            $table->rememberToken();    // Used for the "Remember Me" login feature.
-            $table->timestamps();       // created_at and updated_at.
-        });
-    }
+public function up(): void
+{
+    Schema::create('users', function (Blueprint $table) {
+        $table->id();
+        $table->string('username', 50)->unique(); // From the SQL template
+        $table->string('full_name', 120); // From the SQL template
+        $table->string('email')->unique()->nullable(); 
+        $table->string('password'); // Laravel handles password_hash automatically
+        $table->rememberToken();
+        $table->timestamps(); // Handles created_at and updated_at
+    });
+}
 
     /**
      * Reverse the migrations.
