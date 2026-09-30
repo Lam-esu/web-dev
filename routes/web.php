@@ -44,4 +44,7 @@ Route::middleware(['auth'])->group(function () {
     // Attendance Log
     Route::get('/attendance-log', [AttendanceController::class, 'log'])->name('attendance.log');
 
+    // Logout Route (Added here)
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 });
