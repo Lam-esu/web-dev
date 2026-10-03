@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Employee; // Make sure the model is imported
+use App\Models\Employee;
 
 class EmployeeController extends Controller
 {
@@ -13,18 +13,38 @@ class EmployeeController extends Controller
         return view('employee_registration');
     }
 
-    // Handles the form submission when registering an employee
+    // Handles employee registration
     public function store(Request $request)
     {
-        /** 
-         * GROUPMATE TASK:
-         * 1. Validate the $request data (first_name, last_name, employee_number, department_position, picture)
-         * 2. Handle picture upload (if any) and save the file path
-         * 3. Use Employee::create() to save to the database
-         * 4. Redirect back with a success message (e.g., return back()->with('success', 'Employee registered!');)
-         */
+        // Validate the submitted data
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:80'],
+            'last_name' => ['required', 'string', 'max:80'],
+            'employee_number' => ['required', 'string', 'max:50', 'unique:employees,employee_number'],
+            'department_position' => ['required', 'string', 'max:150'],
+            'picture' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'first_name.required' => 'First name is required.',
+            'last_name.required' => 'Last name is required.',
+            'employee_number.required' => 'Employee number is required.',
+            'employee_number.unique' => 'This employee number is already registered.',
+            'department_position.required' => 'Department/position is required.',
+            'picture.image' => 'The uploaded file must be an image.',
+            'picture.max' => 'The picture must not be larger than 2MB.',
+        ]);
 
-        // Temporary return so the button doesn't break while building
-        return back()->with('status', 'Employee store logic goes here!');
+        // Handle picture upload if provided
+        if ($request->hasFile('picture')) {
+            $validated['picture'] = $request->file('picture')
+                ->store('employees', 'public');
+        }
+
+        // Save employee to database
+        Employee::create($validated);
+
+        // Redirect back with success message
+        return redirect()
+            ->route('employee.registration')
+            ->with('success', 'Employee registered successfully!');
     }
 }
