@@ -408,3 +408,95 @@ body {
     padding: 16px;
     margin-bottom: 8px;
 }
+/* =========================================
+   Employee Registration
+   ========================================= */
+
+.registration-card {
+    max-width: 600px;
+    text-align: left;
+}
+
+.registration-card h2 {
+    text-align: center;
+}
+
+.registration-card > p {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.registration-card .form-group {
+    margin-bottom: 20px;
+}
+
+.registration-card .form-control {
+    text-align: left;
+    font-size: 14px;
+    padding: 12px 14px;
+    margin-bottom: 0;
+}
+
+.registration-card .form-control[type="file"] {
+    cursor: pointer;
+    padding: 10px;
+}
+
+.registration-card .form-control:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 1px var(--brand-primary);
+}
+
+.registration-card .form-control.is-invalid {
+    border-color: #ef4444;
+}
+
+.file-help {
+    display: block;
+    margin-top: 7px;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.registration-submit {
+    margin-top: 8px;
+}
+
+/* Make validation errors easier to see */
+.registration-card .field-error {
+    margin-top: 6px;
+}
+
+/* Registration alerts */
+.registration-card .alert {
+    text-align: left;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+
+    .top-nav {
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px 20px;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+    }
+
+    .main-content {
+        padding: 16px;
+        align-items: flex-start;
+    }
+
+    .registration-card {
+        padding: 32px 24px;
+    }
+}
+
+
+
+
