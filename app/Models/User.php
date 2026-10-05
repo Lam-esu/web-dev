@@ -22,7 +22,14 @@ class User extends Authenticatable
         'full_name',
         'email',
         'password',
+        'role', // Added role here
     ];
+
+    // Helper method to easily check admin status across your app
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
     /**
      * The attributes that should be hidden for serialization.
      *

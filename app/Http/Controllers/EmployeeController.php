@@ -7,10 +7,24 @@ use App\Models\Employee;
 
 class EmployeeController extends Controller
 {
-    // Shows the employee registration page
+    // Shows the employee registration page with an auto-generated ID
     public function create()
     {
-        return view('employee_registration');
+        // Fetch the most recently added employee
+        $lastEmployee = Employee::orderBy('id', 'desc')->first();
+
+        // If the table is empty, start at 1. Otherwise, increment the last number.
+        if (!$lastEmployee || !str_starts_with($lastEmployee->employee_number, 'bai-')) {
+            $nextNumber = 'bai-00001';
+        } else {
+            // Strip 'bai-' from the string, convert to integer, add 1
+            $lastSequence = (int) str_replace('bai-', '', $lastEmployee->employee_number);
+            // Format back to bai-XXXXX
+            $nextNumber = 'bai-' . str_pad($lastSequence + 1, 5, '0', STR_PAD_LEFT);
+        }
+
+        // Pass the generated number to the Blade view
+        return view('employee_registration', compact('nextNumber'));
     }
 
     // Handles employee registration

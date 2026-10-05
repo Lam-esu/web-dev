@@ -8,11 +8,15 @@
     <nav class="top-nav">
         <div class="nav-brand">Baittendance Monitoring System</div>
         <div class="nav-links">
-            <a href="{{ route('dashboard') }}">Attendance</a>
-            <a href="{{ route('employee.registration') }}">Employee Registration</a>
-            <a href="{{ route('attendance.log') }}">Attendance Log</a>
+            <a href="{{ route('dashboard') }}" style="color: var(--brand-primary);">Attendance</a>
             
-            <!-- Logout Form -->
+            <!-- Only show these links if the user is a Professor/Admin -->
+            @if(Auth::user()->isAdmin())
+                <a href="{{ route('employee.registration') }}">Student Registration</a>
+                <a href="{{ route('attendance.log') }}">Full Attendance Log</a>
+            @endif
+            
+            <!-- Logout Form (Visible to everyone) -->
             <form method="POST" action="{{ route('logout') }}" style="display:inline;">
                 @csrf
                 <button type="submit" class="btn-link">Logout</button>

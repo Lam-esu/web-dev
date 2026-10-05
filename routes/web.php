@@ -33,18 +33,19 @@ Route::middleware('guest')->group(function () {
 // ----------------------------------------------------------------------
 Route::middleware(['auth'])->group(function () {
     
-    // Dashboard & Recording Attendance
+    // Shared Routes (Both Students and Admins can see the dashboard and logout)
     Route::get('/dashboard', [AttendanceController::class, 'index'])->name('dashboard');
     Route::post('/record-attendance', [AttendanceController::class, 'store'])->name('attendance.store');
-
-    // Employee Registration
-    Route::get('/employee-registration', [EmployeeController::class, 'create'])->name('employee.registration');
-    Route::post('/employee-registration', [EmployeeController::class, 'store'])->name('employee.store');
-
-    // Attendance Log
-    Route::get('/attendance-log', [AttendanceController::class, 'log'])->name('attendance.log');
-
-    // Logout Route (Added here)
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    // Admin-Only Routes (Protected by the new 'role:admin' middleware)
+    Route::middleware(['role:admin'])->group(function () {
+        // Employee/Student Registration
+        Route::get('/employee-registration', [EmployeeController::class, 'create'])->name('employee.registration');
+        Route::post('/employee-registration', [EmployeeController::class, 'store'])->name('employee.store');
+
+        // Full Attendance Log
+        Route::get('/attendance-log', [AttendanceController::class, 'log'])->name('attendance.log');
+    });
 
 });

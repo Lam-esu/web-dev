@@ -13,12 +13,16 @@ public function up(): void
 {
     Schema::create('users', function (Blueprint $table) {
         $table->id();
-        $table->string('username', 50)->unique(); // From the SQL template
-        $table->string('full_name', 120); // From the SQL template
+        $table->string('username', 50)->unique(); 
+        $table->string('full_name', 120); 
         $table->string('email')->unique()->nullable(); 
-        $table->string('password'); // Laravel handles password_hash automatically
+        $table->string('password'); 
+        
+        // Change the default role here!
+        $table->string('role')->default('employee'); 
+        
         $table->rememberToken();
-        $table->timestamps(); // Handles created_at and updated_at
+        $table->timestamps(); 
     });
 }
 

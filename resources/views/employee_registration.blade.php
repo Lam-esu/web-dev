@@ -122,28 +122,17 @@
 
                 <!-- Employee Number -->
                 <div class="form-group">
-                    <label for="employee_number">
-                        Employee Number
-                    </label>
-
-                    <input
-                        type="text"
-                        id="employee_number"
-                        name="employee_number"
-                        class="form-control @error('employee_number') is-invalid @enderror"
-                        value="{{ old('employee_number') }}"
-                        placeholder="Enter employee number"
-                        maxlength="50"
-                        required
+                    <label for="employee_number">Employee Number</label>
+                    <input 
+                        type="text" 
+                        id="employee_number" 
+                        name="employee_number" 
+                        class="form-control" 
+                        value="{{ $nextNumber }}" 
+                        readonly 
+                        style="background-color: var(--bg-surface); cursor: not-allowed; color: var(--text-secondary);"
                     >
-
-                    @error('employee_number')
-                        <div class="field-error">
-                            {{ $message }}
-                        </div>
-                    @enderror
                 </div>
-
                 <!-- Department / Position -->
                 <div class="form-group">
                     <label for="department_position">

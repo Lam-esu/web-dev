@@ -33,13 +33,15 @@ class AttendanceController extends Controller
     // Shows the data table of all attendance records
     public function log()
     {
-        /** 
-         * GROUPMATE TASK:
-         * 1. Fetch all records from the attendances table (e.g., Attendance::with('employee')->latest()->get();)
-         * 2. Pass the data to the view using the compact() function.
-         */
+        if (Auth::user()->isAdmin()) {
+            // Admin sees all records
+            // $attendances = Attendance::with('employee')->latest()->get();
+        } else {
+            // Student sees only their own records 
+            // Note: You will need to match the 'employee_number' to the student's logged-in account
+            // $attendances = Attendance::where('employee_number', Auth::user()->username)->latest()->get();
+        }
 
-        // Right now, it just loads the blank view
-        return view('attendance_log');
+        return view('attendance_log'); // Pass the variable to the view via compact('attendances')
     }
 }
