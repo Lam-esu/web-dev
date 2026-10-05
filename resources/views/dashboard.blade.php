@@ -27,6 +27,22 @@
     <!-- Main Card Area -->
     <div class="main-content">
         <div class="attendance-card">
+            @if(session('status'))
+                <div class="alert alert-success">
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert alert-error">
+                    <ul>
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('attendance.store') }}">
                 @csrf
                 
@@ -36,6 +52,7 @@
                         type="text" 
                         name="employee_number" 
                         class="form-control" 
+                        value="{{ old('employee_number') }}"
                         placeholder="Enter Employee Number" 
                         required 
                         autofocus

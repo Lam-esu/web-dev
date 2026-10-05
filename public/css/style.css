@@ -497,6 +497,43 @@ body {
     }
 }
 
+/* =========================================
+   Attendance Log Table
+   ========================================= */
+.table-responsive {
+    overflow-x: auto;
+    text-align: left;
+}
+
+.log-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.log-table th,
+.log-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+}
+
+.log-table th {
+    color: var(--text-secondary);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.log-table tbody tr:hover {
+    background-color: var(--bg-highlight);
+}
+
+.log-empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 32px 14px !important;
+}
 
 
 
