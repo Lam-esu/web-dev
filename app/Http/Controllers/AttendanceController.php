@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Attendance;
 use App\Models\Employee;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
@@ -18,17 +18,33 @@ class AttendanceController extends Controller
     // Handles the form submission when an employee presses enter on the dashboard
     public function store(Request $request)
     {
-        /** 
-         * GROUPMATE TASK:
-         * 1. Validate that 'employee_number' was submitted.
-         * 2. Query the Employee model to find the user by that number.
-         * 3. If found, insert a new Attendance record with today's date and current time.
-         * 4. Watch out for duplicates! Check if they already timed in today.
-         * 5. Redirect back with success or error message.
-         */
+        $validated = $request->validate([
+            'employee_number' => ['required', 'string', 'exists:employees,employee_number'],
+            'action' => ['required', 'in:clock_in,clock_out'],
+        ], [
+            'employee_number.exists' => 'No employee was found with that number.',
+        ]);
 
-        // Temporary return 
-        return back()->with('status', 'Attendance recording logic goes here!');
+        if ($validated['action'] === 'clock_out') {
+            return back()
+                ->withErrors(['action' => 'Clock-out is not supported yet.'])
+                ->withInput();
+        }
+
+        $employee = Employee::where('employee_number', $validated['employee_number'])->firstOrFail();
+
+        if ($employee->attendances()->whereDate('attendance_date', today())->exists()) {
+            return back()
+                ->withErrors(['employee_number' => 'This employee has already clocked in today.'])
+                ->withInput();
+        }
+
+        $employee->attendances()->create([
+            'attendance_date' => today(),
+            'attendance_time' => now()->format('H:i:s'),
+        ]);
+
+        return back()->with('status', 'Attendance recorded successfully.');
     }
 
     // Shows the data table of all attendance records
