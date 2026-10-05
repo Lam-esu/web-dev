@@ -34,15 +34,19 @@ class AttendanceController extends Controller
     // Shows the data table of all attendance records
     public function log()
     {
-        if (Auth::user()->isAdmin()) {
-            // Admin sees all records
-            // $attendances = Attendance::with('employee')->latest()->get();
-        } else {
-            // Student sees only their own records 
-            // Note: You will need to match the 'employee_number' to the student's logged-in account
-            // $attendances = Attendance::where('employee_number', Auth::user()->username)->latest()->get();
+        $query = Attendance::with('employee')
+            ->orderByDesc('attendance_date')
+            ->orderByDesc('attendance_time');
+
+        if (!Auth::user()->isAdmin()) {
+            // Students only see their own records
+            $query->whereHas('employee', function ($q) {
+                $q->where('employee_number', Auth::user()->username);
+            });
         }
 
-        return view('attendance_log'); // Pass the variable to the view via compact('attendances')
+        $attendances = $query->get();
+
+        return view('attendance_log', compact('attendances'));
     }
 }

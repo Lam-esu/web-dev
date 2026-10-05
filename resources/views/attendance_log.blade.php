@@ -11,7 +11,7 @@
             <a href="{{ route('dashboard') }}">Attendance</a>
             <a href="{{ route('employee.registration') }}">Employee Registration</a>
             <a href="{{ route('attendance.log') }}">Attendance Log</a>
-            
+
             <!-- Logout Form -->
             <form method="POST" action="{{ route('logout') }}" style="display:inline;">
                 @csrf
@@ -25,10 +25,34 @@
         <div class="attendance-card" style="max-width: 900px; width: 100%;">
             <h2>Attendance Records</h2>
             <p>View all employee time-in logs.</p>
-            
-            <!-- Groupmate Task: Build the data table here -->
+
             <div class="table-responsive">
-                <!-- Data table will go here -->
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>Employee No.</th>
+                            <th>Name</th>
+                            <th>Department / Position</th>
+                            <th>Date</th>
+                            <th>Time In</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($attendances as $attendance)
+                            <tr>
+                                <td>{{ $attendance->employee->employee_number }}</td>
+                                <td>{{ $attendance->employee->first_name }} {{ $attendance->employee->last_name }}</td>
+                                <td>{{ $attendance->employee->department_position }}</td>
+                                <td>{{ $attendance->attendance_date->format('M d, Y') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($attendance->attendance_time)->format('h:i A') }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="log-empty">No attendance records yet.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
