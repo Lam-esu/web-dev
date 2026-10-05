@@ -35,6 +35,7 @@
                             <th>Department / Position</th>
                             <th>Date</th>
                             <th>Time In</th>
+                            <th>Time Out</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,6 +46,7 @@
                                 <td>{{ $attendance->employee->department_position }}</td>
                                 <td>{{ $attendance->attendance_date->format('M d, Y') }}</td>
                                 <td>{{ \Carbon\Carbon::parse($attendance->attendance_time)->format('h:i A') }}</td>
+                                <td>{{ $attendance->time_out ? \Carbon\Carbon::parse($attendance->time_out)->format('h:i A') : '---' }}</td>
                             </tr>
                         @empty
                             <tr>

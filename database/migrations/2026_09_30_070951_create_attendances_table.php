@@ -6,30 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-public function up(): void
-{
-    Schema::create('attendances', function (Blueprint $table) {
-        $table->id();
-        
-        // Foreign Key to employees table (Replaces student_id)
-        $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade')->onUpdate('cascade');
-        
-        $table->date('attendance_date');
-        $table->time('attendance_time');
-        
-        $table->timestamp('recorded_at')->useCurrent();
-        $table->timestamps();
+    public function up(): void
+    {
+        Schema::create('attendances', function (Blueprint $table) {
+            $table->id();
+            
+            // Foreign Key to employees table
+            $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade')->onUpdate('cascade');
+            
+            $table->date('attendance_date');
+            $table->time('time_in')->nullable();
+            $table->time('time_out')->nullable();
+            
+            $table->timestamp('recorded_at')->useCurrent();
+            $table->timestamps();
 
-        // Unique Key constraint from the SQL template
-        $table->unique(['employee_id', 'attendance_date'], 'unique_employee_date');
-    });
-}
-    /**
-     * Reverse the migrations.
-     */
+            // Ensures only one attendance row per employee per day
+            $table->unique(['employee_id', 'attendance_date'], 'unique_employee_date');
+        });
+    }
+
     public function down(): void
     {
         Schema::dropIfExists('attendances');

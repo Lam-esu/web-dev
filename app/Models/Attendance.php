@@ -10,7 +10,8 @@ class Attendance extends Model
     protected $fillable = [
         'employee_id',
         'attendance_date',
-        'attendance_time',
+        'time_in',
+        'time_out',
     ];
 
     protected function casts(): array
