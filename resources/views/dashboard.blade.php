@@ -12,7 +12,7 @@
             
             <!-- Only show these links if the user is a Professor/Admin -->
             @if(Auth::user()->isAdmin())
-                <a href="{{ route('employee.registration') }}">Student Registration</a>
+                <a href="{{ route('employee.registration') }}">Employee Registration</a>
                 <a href="{{ route('attendance.log') }}">Full Attendance Log</a>
             @endif
             
@@ -27,23 +27,33 @@
     <!-- Main Card Area -->
     <div class="main-content">
         <div class="attendance-card">
-            <h2>Employee Attendance</h2>
-            <p>Enter the employee number and press Enter.</p>
-
-            <form>
-                <input 
-                    type="text" 
-                    class="form-control" 
-                    placeholder="Enter Employee Number" 
-                    autofocus 
-                    style="text-align: center; font-size: 18px; padding: 16px;"
-                >
+            <form method="POST" action="{{ route('attendance.store') }}">
+                @csrf
                 
-                <div class="button-group" style="justify-content: center; margin-top: 24px;">
-                    <button type="submit" class="btn btn-primary" style="width: auto; padding: 12px 32px;">Record Attendance</button>
-                    <a href="{{ route('employee.registration') }}" class="btn btn-secondary" style="width: auto; padding: 12px 32px; display: inline-flex; align-items: center;">
-                        Employee Registration
-                    </a>                
+                <!-- The Input Field -->
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <input 
+                        type="text" 
+                        name="employee_number" 
+                        class="form-control" 
+                        placeholder="Enter Employee Number" 
+                        required 
+                        autofocus
+                        style="width: 100%; padding: 15px; background: transparent; border: 1px solid #fff; color: #fff; text-align: center; border-radius: 5px;"
+                    >
+                </div>
+                
+                <!-- The Action Buttons -->
+                <div class="button-group" style="display: flex; gap: 10px; justify-content: center;">
+                    
+                    <button type="submit" name="action" value="clock_in" class="btn btn-primary" style="background-color: #ff6b9e; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
+                        Clock In
+                    </button>
+                    
+                    <button type="submit" name="action" value="clock_out" class="btn btn-secondary" style="background-color: #444; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;">
+                        Clock Out
+                    </button>
+
                 </div>
             </form>
         </div>
