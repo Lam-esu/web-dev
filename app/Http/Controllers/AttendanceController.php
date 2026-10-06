@@ -51,7 +51,17 @@ class AttendanceController extends Controller
             }
         } 
         else { // clock_out
-            // Look for the most recent shift that hasn't been clocked out yet (handles night shifts!)
+            // 1. Check if they already successfully completed a shift today
+            $completedShift = $employee->attendances()
+                ->whereDate('attendance_date', $today)
+                ->whereNotNull('time_out')
+                ->first();
+
+            if ($completedShift) {
+                return back()->with('error', 'You have already clocked out today at ' . \Carbon\Carbon::parse($completedShift->time_out)->format('h:i A') . '.');
+            }
+
+            // 2. Look for the most recent shift that hasn't been clocked out yet (handles night shifts!)
             $attendance = $employee->attendances()
                 ->whereNotNull('time_in')
                 ->whereNull('time_out')
@@ -73,20 +83,63 @@ class AttendanceController extends Controller
         ]);
     }
 
-    public function log()
+    public function log(Request $request)
     {
+        // Fetch unique departments for the dropdown filter
+        $departments = Employee::select('department_position')
+            ->whereNotNull('department_position')
+            ->distinct()
+            ->pluck('department_position');
+
         $query = Attendance::with('employee')
             ->orderByDesc('attendance_date')
             ->orderByDesc('time_in');
 
+        // Role restriction: employees only see their own logs
         if (!Auth::user()->isAdmin()) {
             $query->whereHas('employee', function ($q) {
                 $q->where('employee_number', Auth::user()->username);
             });
         }
 
+        // 1. Search Filter (ID or Name)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('employee', function ($q) use ($search) {
+                $q->where('employee_number', 'like', "%{$search}%")
+                  ->orWhere('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%");
+            });
+        }
+
+        // 2. Date Range Filter
+        if ($request->filled('start_date')) {
+            $query->whereDate('attendance_date', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('attendance_date', '<=', $request->end_date);
+        }
+
+        // 3. Department Filter
+        if ($request->filled('department')) {
+            $department = $request->department;
+            $query->whereHas('employee', function ($q) use ($department) {
+                $q->where('department_position', $department);
+            });
+        }
+
+        // 4. Status Filter (Missing Clock Out vs Completed)
+        if ($request->filled('status')) {
+            if ($request->status === 'missing_out') {
+                $query->whereNull('time_out');
+            } elseif ($request->status === 'completed') {
+                $query->whereNotNull('time_out');
+            }
+        }
+
+        // ->withQueryString() ensures pagination links remember the active filters
         $attendances = $query->paginate(15)->withQueryString();
 
-        return view('attendance_log', compact('attendances'));
+        return view('attendance_log', compact('attendances', 'departments'));
     }
 }
