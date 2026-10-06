@@ -5,6 +5,15 @@
     box-sizing: border-box;
 }
 
+input, button, select, textarea {
+    font-family: inherit;
+}
+
+::placeholder {
+    font-family: inherit;
+    color: var(--text-secondary); /* Keeps placeholders matching your theme */
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
 body {
@@ -540,13 +549,13 @@ body {
    Dashboard 3-Column Layout
    ========================================= */
 .dashboard-layout {
-    max-width: 1400px;
+    max-width: 1500px; /* Slightly wider to accommodate the bigger gap */
     margin: 0 auto;
-    padding: 40px 24px;
+    padding: 60px 40px; 
     display: flex;
-    gap: 32px;
+    gap: 80px; /* Increased from 32px to space the 3 main columns */
     align-items: flex-start;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 /* Left Panel: Live Time */
