@@ -1,199 +1,308 @@
 @extends('layouts.app')
 
-@section('title', 'Register Employee - Baittendance')
+@section('title', 'Employee Approval - Baittendance')
 
 @section('content')
+
 <div class="attendance-wrapper">
 
-    <!-- Top Navigation -->
+    {{-- Top Navigation --}}
     <nav class="top-nav">
+
         <div class="nav-brand">
             Baittendance Monitoring System
         </div>
 
         <div class="nav-links">
-            <a href="{{ route('dashboard') }}">Attendance</a>
 
-            <a href="{{ route('employee.registration') }}">
-                Employee Registration
+            <a href="{{ route('dashboard') }}">
+                Attendance
+            </a>
+
+            <a
+                href="{{ route('employee.registration') }}"
+                style="color: var(--brand-primary);"
+            >
+                Employee Approval
             </a>
 
             <a href="{{ route('attendance.log') }}">
                 Attendance Log
             </a>
 
-            <!-- Logout Form -->
-            <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+            <form
+                method="POST"
+                action="{{ route('logout') }}"
+                style="display:inline;"
+            >
                 @csrf
 
-                <button type="submit" class="btn-link">
+                <button
+                    type="submit"
+                    class="btn-link"
+                >
                     Logout
                 </button>
             </form>
+
         </div>
+
     </nav>
 
-    <!-- Main Content -->
+
+    {{-- Main Content --}}
     <div class="main-content">
 
         <div class="attendance-card registration-card">
 
-            <h2>Register New Employee</h2>
+            <h2>
+                Employee Approval
+            </h2>
 
             <p>
-                Enter the employee details below.
+                Review pending employee accounts and assign their employee number and role.
             </p>
 
-            <!-- Success Message -->
+
+            {{-- Success Message --}}
             @if(session('success'))
+
                 <div class="alert alert-success">
                     {{ session('success') }}
                 </div>
+
             @endif
 
-            <!-- General Validation Error -->
+
+            {{-- Errors --}}
             @if($errors->any())
+
                 <div class="alert alert-error">
-                    <strong>Please correct the following errors:</strong>
+
+                    <strong>
+                        Please correct the following errors:
+                    </strong>
 
                     <ul>
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
+
                 </div>
+
             @endif
 
-            <!-- Registration Form -->
-            <form
-                method="POST"
-                action="{{ route('employee.store') }}"
-                enctype="multipart/form-data"
-            >
-                @csrf
 
-                <!-- First Name -->
-                <div class="form-group">
-                    <label for="first_name">
-                        First Name
-                    </label>
+            {{-- Pending Employees --}}
+            @forelse($pendingUsers as $user)
 
-                    <input
-                        type="text"
-                        id="first_name"
-                        name="first_name"
-                        class="form-control @error('first_name') is-invalid @enderror"
-                        value="{{ old('first_name') }}"
-                        placeholder="Enter first name"
-                        maxlength="80"
-                        required
-                    >
-
-                    @error('first_name')
-                        <div class="field-error">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-
-                <!-- Last Name -->
-                <div class="form-group">
-                    <label for="last_name">
-                        Last Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="last_name"
-                        name="last_name"
-                        class="form-control @error('last_name') is-invalid @enderror"
-                        value="{{ old('last_name') }}"
-                        placeholder="Enter last name"
-                        maxlength="80"
-                        required
-                    >
-
-                    @error('last_name')
-                        <div class="field-error">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-
-                <!-- Employee Number -->
-                <div class="form-group">
-                    <label for="employee_number">Employee Number</label>
-                    <input 
-                        type="text" 
-                        id="employee_number" 
-                        name="employee_number" 
-                        class="form-control" 
-                        value="{{ $nextNumber }}" 
-                        readonly 
-                        style="background-color: var(--bg-surface); cursor: not-allowed; color: var(--text-secondary);"
-                    >
-                </div>
-                <!-- Department / Position -->
-                <div class="form-group">
-                    <label for="department_position">
-                        Department / Position
-                    </label>
-
-                    <input
-                        type="text"
-                        id="department_position"
-                        name="department_position"
-                        class="form-control @error('department_position') is-invalid @enderror"
-                        value="{{ old('department_position') }}"
-                        placeholder="e.g. IT Department / Software Developer"
-                        maxlength="150"
-                        required
-                    >
-
-                    @error('department_position')
-                        <div class="field-error">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-
-                <!-- Picture -->
-                <div class="form-group">
-                    <label for="picture">
-                        Employee Picture
-                    </label>
-
-                    <input
-                        type="file"
-                        id="picture"
-                        name="picture"
-                        class="form-control file-input @error('picture') is-invalid @enderror"
-                        accept=".jpg,.jpeg,.png,.webp"
-                    >
-
-                    <small class="file-help">
-                        Optional. JPG, JPEG, PNG, or WEBP. Maximum size: 2MB.
-                    </small>
-
-                    @error('picture')
-                        <div class="field-error">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-
-                <!-- Submit Button -->
-                <button
-                    type="submit"
-                    class="btn btn-primary registration-submit"
+                <div
+                    class="approval-card"
+                    style="
+                        border: 1px solid rgba(255,255,255,0.08);
+                        border-radius: 12px;
+                        padding: 24px;
+                        margin-bottom: 20px;
+                        background: var(--bg-surface);
+                    "
                 >
-                    Save Employee
-                </button>
 
-            </form>
+                    {{-- Employee Information --}}
+                    <div style="margin-bottom: 20px;">
+
+                        @if($user->pfp)
+
+                            <img
+                                src="{{ asset('storage/' . $user->pfp) }}"
+                                alt="Profile Picture"
+                                style="
+                                    width: 80px;
+                                    height: 80px;
+                                    object-fit: cover;
+                                    border-radius: 50%;
+                                    margin-bottom: 12px;
+                                "
+                            >
+
+                        @endif
+
+                        <h3 style="margin-bottom: 5px;">
+                            {{ $user->first_name }}
+                            {{ $user->last_name }}
+                        </h3>
+
+                        <p style="margin: 0;">
+                            {{ $user->email }}
+                        </p>
+
+                        <small style="color: var(--text-secondary);">
+                            Registered:
+                            {{ $user->created_at->format('M d, Y h:i A') }}
+                        </small>
+
+                    </div>
+
+
+                    {{-- Approval Form --}}
+                    <form
+                        method="POST"
+                        action="{{ route('employee.store') }}"
+                    >
+
+                        @csrf
+
+                        <input
+                            type="hidden"
+                            name="user_id"
+                            value="{{ $user->id }}"
+                        >
+
+
+                        {{-- Employee Number --}}
+                        <div class="form-group">
+
+                            <label for="employee_number_{{ $user->id }}">
+                                Employee Number
+                            </label>
+
+                            <input
+                                type="text"
+                                name="employee_number"
+                                class="form-control"
+                                placeholder="Enter employee number"
+                                value="{{ old('employee_number') }}"
+                                required
+                            >
+                                style="
+                                    background-color: var(--bg-surface);
+                                    cursor: not-allowed;
+                                    color: var(--text-secondary);
+                                "
+                            >
+
+                        </div>
+
+
+                        {{-- Role --}}
+                        <div class="form-group">
+
+                            <label for="department_position_{{ $user->id }}">
+                                Role
+                            </label>
+
+                            <select
+                                id="department_position_{{ $user->id }}"
+                                name="department_position"
+                                class="form-control"
+                                required
+                            >
+
+                                <option value="">
+                                    Select employee role
+                                </option>
+
+                                <option value="HR Officer">
+                                    HR Officer
+                                </option>
+
+                                <option value="Finance Staff">
+                                    Finance Staff
+                                </option>
+
+                                <option value="Marketing Employee">
+                                    Marketing Employee
+                                </option>
+
+                                <option value="IT Staff">
+                                    IT Staff
+                                </option>
+
+                                <option value="Employee">
+                                    Employee
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <div
+                            class="button-group"
+                            style="gap: 10px;"
+                        >
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                style="flex: 1;"
+                            >
+                                Approve Employee
+                            </button>
+
+                        </div>
+
+                    </form>
+
+
+                    {{-- Reject --}}
+                    <form
+                        method="POST"
+                        action="{{ route('employee.reject') }}"
+                        style="margin-top: 10px;"
+                    >
+
+                        @csrf
+
+                        <input
+                            type="hidden"
+                            name="user_id"
+                            value="{{ $user->id }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="btn btn-secondary"
+                            style="width: 100%;"
+                            onclick="
+                                return confirm(
+                                    'Are you sure you want to reject this account?'
+                                );
+                            "
+                        >
+                            Reject
+                        </button>
+
+                    </form>
+
+                </div>
+
+            @empty
+
+                <div
+                    style="
+                        text-align: center;
+                        padding: 40px 20px;
+                        color: var(--text-secondary);
+                    "
+                >
+
+                    <h3>
+                        No Pending Employees
+                    </h3>
+
+                    <p>
+                        There are currently no employee accounts waiting for approval.
+                    </p>
+
+                </div>
+
+            @endforelse
 
         </div>
 
     </div>
+
 </div>
+
 @endsection

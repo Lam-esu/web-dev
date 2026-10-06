@@ -96,9 +96,10 @@ class AttendanceController extends Controller
             ->orderByDesc('time_in');
 
         // Role restriction: employees only see their own logs
+        // Employees only see their own attendance logs.
         if (!Auth::user()->isAdmin()) {
             $query->whereHas('employee', function ($q) {
-                $q->where('employee_number', Auth::user()->username);
+                $q->where('user_id', Auth::id());
             });
         }
 
