@@ -4,61 +4,91 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Employee;
+use App\Models\User;
 
 class EmployeeController extends Controller
 {
-    // Shows the employee registration page with an auto-generated ID
-    public function create()
+    // ----------------------------------------------------
+    // SUPER ADMIN ONLY: User Account Management
+    // ----------------------------------------------------
+    public function users()
     {
-        // Fetch the most recently added employee
-        $lastEmployee = Employee::orderBy('id', 'desc')->first();
+        $pendingUsers = User::where('status', 'pending')->get();
+        $approvedUsers = User::where('status', 'approved')->get();
 
-        // If the table is empty, start at 1. Otherwise, increment the last number.
+        return view('users', compact('pendingUsers', 'approvedUsers'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => ['required', 'exists:users,id'],
+            'role' => ['required', 'string', 'max:150'],
+        ]);
+
+        $user = User::findOrFail($validated['user_id']);
+
+        $user->update([
+            'status' => 'approved',
+            'role' => $validated['role']
+        ]);
+
+        return redirect()->back()->with('success', "System account for {$user->first_name} has been approved!");
+    }
+
+    public function reject(Request $request)
+    {
+        $user = User::findOrFail($request->user_id);
+        $user->delete();
+
+        return redirect()->back()->with('success', 'Pending account has been rejected.');
+    }
+
+    public function updateRole(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'role' => 'required|string'
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        $user->update(['role' => $request->role]);
+
+        return redirect()->back()->with('success', "Role successfully updated.");
+    }
+
+    // ----------------------------------------------------
+    // ALL ADMINS: Manual Employee Registration
+    // ----------------------------------------------------
+    public function registration()
+    {
+        $lastEmployee = Employee::orderBy('id', 'desc')->first();
         if (!$lastEmployee || !str_starts_with($lastEmployee->employee_number, 'bai-')) {
             $nextNumber = 'bai-00001';
         } else {
-            // Strip 'bai-' from the string, convert to integer, add 1
             $lastSequence = (int) str_replace('bai-', '', $lastEmployee->employee_number);
-            // Format back to bai-XXXXX
             $nextNumber = 'bai-' . str_pad($lastSequence + 1, 5, '0', STR_PAD_LEFT);
         }
 
-        // Pass the generated number to the Blade view
         return view('employee_registration', compact('nextNumber'));
     }
 
-    // Handles employee registration
-    public function store(Request $request)
+    public function storeManual(Request $request)
     {
-        // Validate the submitted data
         $validated = $request->validate([
             'first_name' => ['required', 'string', 'max:80'],
             'last_name' => ['required', 'string', 'max:80'],
             'employee_number' => ['required', 'string', 'max:50', 'unique:employees,employee_number'],
             'department_position' => ['required', 'string', 'max:150'],
             'picture' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-        ], [
-            'first_name.required' => 'First name is required.',
-            'last_name.required' => 'Last name is required.',
-            'employee_number.required' => 'Employee number is required.',
-            'employee_number.unique' => 'This employee number is already registered.',
-            'department_position.required' => 'Department/position is required.',
-            'picture.image' => 'The uploaded file must be an image.',
-            'picture.max' => 'The picture must not be larger than 2MB.',
         ]);
 
-        // Handle picture upload if provided
         if ($request->hasFile('picture')) {
-            $validated['picture'] = $request->file('picture')
-                ->store('employees', 'public');
+            $validated['picture'] = $request->file('picture')->store('employees', 'public');
         }
 
-        // Save employee to database
         Employee::create($validated);
 
-        // Redirect back with success message
-        return redirect()
-            ->route('employee.registration')
-            ->with('success', 'Employee registered successfully!');
+        return redirect()->back()->with('success', 'Employee registered manually!');
     }
 }

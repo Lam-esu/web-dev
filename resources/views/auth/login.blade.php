@@ -7,8 +7,9 @@
     <div class="auth-card">
 
         <div class="auth-brand">
+            <div class="logo-badge">B</div>
             <h1>Welcome back</h1>
-            <p>Log in to access your Spotibai Dashboard</p>
+            <p>Log in to access your Baittendance</p>
         </div>
 
         {{-- Session status message (e.g. after logging out or registering) --}}
@@ -72,7 +73,7 @@
                 <label for="remember">Remember me</label>
             </div>
 
-            <button type="submit" class="btn btn-primary">Log In</button>
+            <button type="submit" class="btn btn-primary btn-block">Log In</button>
         </form>
 
         <div class="auth-footer">
