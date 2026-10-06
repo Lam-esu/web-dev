@@ -30,8 +30,8 @@ class AttendanceController extends Controller
         ]);
 
         $employee = Employee::where('employee_number', $validated['employee_number'])->firstOrFail();
-        $today = today();
-        $now = now();
+        $now = now('Asia/Manila');
+        $today = $now->toDateString();
         
         if ($validated['action'] === 'clock_in') {
             // For clock-ins, we still strictly check if they already clocked in TODAY
