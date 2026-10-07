@@ -61,6 +61,8 @@
     /* Motion */
     --ease: cubic-bezier(0.33, 0, 0.67, 1);
     --ease-out: cubic-bezier(0.1, 0.9, 0.2, 1);
+    --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
     --t-fast: 100ms;
     --t-base: 160ms;
 }
@@ -612,10 +614,11 @@ select.form-control-sm { padding-right: 28px; background-position: right 8px cen
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: rgba(0, 0, 0, 0.7);
-    animation: modalOverlayFade 0.15s ease-out forwards;
+    background: rgba(0, 0, 0, 0.62);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    animation: overlay-in 260ms var(--ease-out) both, overlay-out 280ms var(--ease-in) 2700ms forwards;
 }
-
 .popup-card {
     width: 100%;
     max-width: 400px;
@@ -625,10 +628,9 @@ select.form-control-sm { padding-right: 28px; background-position: right 8px cen
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-28);
-    /* Sleek snap-in curve */
-    animation: modalSleekPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: transform, opacity;
+    animation: card-in 420ms var(--ease-expo) both, card-out 260ms var(--ease-in) 2700ms forwards;
 }
-
 .popup-banner { margin-bottom: 16px; padding: 8px 12px; font-weight: 600; border: 1px solid transparent; border-radius: var(--radius-sm); }
 .popup-banner.success-in { background-color: rgba(84, 176, 84, 0.12); color: #7fd37f; border-color: rgba(84, 176, 84, 0.35); }
 .popup-banner.success-out { background-color: var(--bg-highlight); color: var(--text-primary); border-color: var(--border-control); }
@@ -662,29 +664,42 @@ select.form-control-sm { padding-right: 28px; background-position: right 8px cen
 .popup-time { margin-top: 16px; font-size: var(--fs-md); font-weight: 600; color: var(--brand-primary); }
 
 /* ---------- 11. Motion ---------- */
-@keyframes modalOverlayFade {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } }
+@keyframes pop { from { opacity: 0; transform: scale(0.96); } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
 
-@keyframes modalSleekPop {
-    from { opacity: 0; transform: scale(0.92) translateY(20px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-}
+/* Clock-in / out popup */
+@keyframes overlay-in { from { opacity: 0; } }
+@keyframes overlay-out { to { opacity: 0; } }
+@keyframes card-in { from { opacity: 0; transform: translateY(16px) scale(0.94); } }
+@keyframes card-out { to { opacity: 0; transform: translateY(8px) scale(0.97); } }
+@keyframes item-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes photo-in { from { opacity: 0; transform: scale(0.92); } }
 
-@keyframes slideUpFade {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+/* Content flows in one piece after another, top to bottom */
+.popup-card > * { animation: item-in 320ms var(--ease-expo) both; }
+.popup-card > .popup-image-wrapper { animation-name: photo-in; }
+.popup-card > :nth-child(1) { animation-delay: 60ms; }
+.popup-card > :nth-child(2) { animation-delay: 95ms; }
+.popup-card > :nth-child(3) { animation-delay: 130ms; }
+.popup-card > :nth-child(4) { animation-delay: 165ms; }
+.popup-card > :nth-child(5) { animation-delay: 200ms; }
+.popup-card > :nth-child(6) { animation-delay: 235ms; }
 
-/* Staggered dashboard card entry */
+/* One quick entrance per screen */
 .page > *,
-.dashboard-layout > .card { animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.dashboard-layout > .card { animation: rise 200ms var(--ease-out) both; }
 .page > :nth-child(2),
 .dashboard-layout > .card:nth-child(2) { animation-delay: 40ms; }
 .page > :nth-child(3),
 .dashboard-layout > .card:nth-child(3) { animation-delay: 80ms; }
 .page > :nth-child(n+4) { animation-delay: 100ms; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; transition-duration: 0.01ms !important; }
+    .popup-overlay, .popup-card, .popup-card > * { animation: none !important; }
+}
 
 /* ---------- 12. Responsive ---------- */
 @media (max-width: 1024px) {
@@ -705,8 +720,4 @@ select.form-control-sm { padding-right: 28px; background-position: right 8px cen
 
 @media (max-width: 480px) {
     .button-group { grid-template-columns: 1fr; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; transition-duration: 0.01ms !important; }
 }
