@@ -83,11 +83,11 @@ class AttendanceController extends Controller
         ]);
     }
 
-public function log(Request $request)
+    public function log(Request $request)
     {
         $query = Attendance::with('employee');
 
-        // Filter by employee search (name or number)
+        // 1. Search (Name or ID)
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->whereHas('employee', function ($q) use ($search) {
@@ -97,22 +97,39 @@ public function log(Request $request)
             });
         }
 
-        // Filter by date
-        if ($request->filled('date')) {
-            $query->whereDate('created_at', $request->input('date'));
+        // 2. Date Range Filters (Matching start_date and end_date from the Blade view)
+        if ($request->filled('start_date')) {
+            $query->whereDate('attendance_date', '>=', $request->input('start_date'));
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('attendance_date', '<=', $request->input('end_date'));
         }
 
-        // Filter by status (clocked in / clocked out)
+        // 3. Status Filter (Matching 'completed' and 'missing_out' from the Blade view)
         if ($request->filled('status')) {
-            if ($request->input('status') === 'in') {
-                $query->whereNull('time_out');
-            } elseif ($request->input('status') === 'out') {
+            if ($request->input('status') === 'completed') {
                 $query->whereNotNull('time_out');
+            } elseif ($request->input('status') === 'missing_out') {
+                $query->whereNull('time_out');
             }
         }
 
-        $attendances = $query->latest()->paginate(15)->withQueryString();
+        // 4. Department Filter
+        if ($request->filled('department')) {
+            $query->whereHas('employee', function ($q) use ($request) {
+                $q->where('department_position', $request->input('department'));
+            });
+        }
 
-        return view('attendance_log', compact('attendances'));
+        // Paginate results and preserve all filter URL parameters
+        $attendances = $query->latest('attendance_date')->paginate(15)->withQueryString();
+
+        // Fetch distinct departments for the dropdown
+        $departments = Employee::select('department_position')
+            ->distinct()
+            ->whereNotNull('department_position')
+            ->pluck('department_position');
+
+        return view('attendance_log', compact('attendances', 'departments'));
     }
 }

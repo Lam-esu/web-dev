@@ -613,9 +613,9 @@ select.form-control-sm { padding-right: 28px; background-position: right 8px cen
     justify-content: center;
     padding: 24px;
     background: rgba(0, 0, 0, 0.7);
-    /* Simplified to only handle the entrance. JS handles the exit. */
-    animation: fade-in 0.2s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+    animation: modalOverlayFade 0.15s ease-out forwards;
 }
+
 .popup-card {
     width: 100%;
     max-width: 400px;
@@ -625,8 +625,10 @@ select.form-control-sm { padding-right: 28px; background-position: right 8px cen
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-28);
-    animation: pop 220ms var(--ease-out) both;
+    /* Sleek snap-in curve */
+    animation: modalSleekPop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
 .popup-banner { margin-bottom: 16px; padding: 8px 12px; font-weight: 600; border: 1px solid transparent; border-radius: var(--radius-sm); }
 .popup-banner.success-in { background-color: rgba(84, 176, 84, 0.12); color: #7fd37f; border-color: rgba(84, 176, 84, 0.35); }
 .popup-banner.success-out { background-color: var(--bg-highlight); color: var(--text-primary); border-color: var(--border-control); }
@@ -660,23 +662,29 @@ select.form-control-sm { padding-right: 28px; background-position: right 8px cen
 .popup-time { margin-top: 16px; font-size: var(--fs-md); font-weight: 600; color: var(--brand-primary); }
 
 /* ---------- 11. Motion ---------- */
-@keyframes rise { from { opacity: 0; transform: translateY(6px); } }
-@keyframes pop { from { opacity: 0; transform: scale(0.96); } }
-@keyframes fade-in { from { opacity: 0; } }
-@keyframes fade-out { to { opacity: 0; } }
+@keyframes modalOverlayFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 
-/* One quick entrance per screen */
+@keyframes modalSleekPop {
+    from { opacity: 0; transform: scale(0.92) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Staggered dashboard card entry */
 .page > *,
-.dashboard-layout > .card { animation: rise 200ms var(--ease-out) both; }
+.dashboard-layout > .card { animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .page > :nth-child(2),
 .dashboard-layout > .card:nth-child(2) { animation-delay: 40ms; }
 .page > :nth-child(3),
 .dashboard-layout > .card:nth-child(3) { animation-delay: 80ms; }
 .page > :nth-child(n+4) { animation-delay: 100ms; }
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; transition-duration: 0.01ms !important; }
-}
 
 /* ---------- 12. Responsive ---------- */
 @media (max-width: 1024px) {
@@ -699,17 +707,6 @@ select.form-control-sm { padding-right: 28px; background-position: right 8px cen
     .button-group { grid-template-columns: 1fr; }
 }
 
-/* ---------- Sleek Animations ---------- */
-@keyframes slideUpFade {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.page, .main-content, .auth-card {
-    animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.dropdown-content {
-    transform-origin: top right;
-    animation: none;
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; transition-duration: 0.01ms !important; }
 }
