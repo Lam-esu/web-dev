@@ -1,7 +1,7 @@
 @php($role = auth()->user()->role)
 <nav class="top-nav">
     <div class="nav-brand">
-        <span class="nav-logo">B</span>
+        <img src="{{ asset('artwork/favicon.png') }}" alt="" class="nav-logo">
         <span>Baittendance</span>
         <span class="role-badge">
             @if($role === 'admin') Super Admin

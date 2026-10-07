@@ -7,7 +7,7 @@
     <div class="auth-card auth-card-wide">
 
         <div class="auth-brand">
-            <div class="logo-badge">B</div>
+            <img src="{{ asset('artwork/favicon.png') }}" alt="Baittendance" class="auth-logo">
             <h1>Create your Baittendance account</h1>
             <p>Create an account to get started</p>
         </div>

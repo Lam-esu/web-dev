@@ -83,64 +83,36 @@ class AttendanceController extends Controller
         ]);
     }
 
-    public function log(Request $request)
+public function log(Request $request)
     {
-        // Fetch unique departments for the dropdown filter
-        $departments = Employee::select('department_position')
-            ->whereNotNull('department_position')
-            ->distinct()
-            ->pluck('department_position');
+        $query = Attendance::with('employee');
 
-        $query = Attendance::with('employee')
-            ->orderByDesc('attendance_date')
-            ->orderByDesc('time_in');
-
-        // Role restriction: employees only see their own logs
-        // Employees only see their own attendance logs.
-        if (!Auth::user()->isAdmin()) {
-            $query->whereHas('employee', function ($q) {
-                $q->where('user_id', Auth::id());
-            });
-        }
-
-        // 1. Search Filter (ID or Name)
+        // Filter by employee search (name or number)
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = $request->input('search');
             $query->whereHas('employee', function ($q) use ($search) {
-                $q->where('employee_number', 'like', "%{$search}%")
-                  ->orWhere('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%");
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('employee_number', 'like', "%{$search}%");
             });
         }
 
-        // 2. Date Range Filter
-        if ($request->filled('start_date')) {
-            $query->whereDate('attendance_date', '>=', $request->start_date);
-        }
-        if ($request->filled('end_date')) {
-            $query->whereDate('attendance_date', '<=', $request->end_date);
+        // Filter by date
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->input('date'));
         }
 
-        // 3. Department Filter
-        if ($request->filled('department')) {
-            $department = $request->department;
-            $query->whereHas('employee', function ($q) use ($department) {
-                $q->where('department_position', $department);
-            });
-        }
-
-        // 4. Status Filter (Missing Clock Out vs Completed)
+        // Filter by status (clocked in / clocked out)
         if ($request->filled('status')) {
-            if ($request->status === 'missing_out') {
+            if ($request->input('status') === 'in') {
                 $query->whereNull('time_out');
-            } elseif ($request->status === 'completed') {
+            } elseif ($request->input('status') === 'out') {
                 $query->whereNotNull('time_out');
             }
         }
 
-        // ->withQueryString() ensures pagination links remember the active filters
-        $attendances = $query->paginate(15)->withQueryString();
+        $attendances = $query->latest()->paginate(15)->withQueryString();
 
-        return view('attendance_log', compact('attendances', 'departments'));
+        return view('attendance_log', compact('attendances'));
     }
 }
